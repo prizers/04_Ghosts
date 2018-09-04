@@ -3,29 +3,42 @@ using System.Text;
 
 namespace hashes
 {
-	public class GhostsTask : 
-		IFactory<Document>, IFactory<Vector>, IFactory<Segment>, IFactory<Cat>, IFactory<Robot>, 
-		IMagic
-	{
-		public void DoMagic()
-		{
-		}
+    public class GhostsTask :
+        IFactory<Document>, IFactory<Vector>, IFactory<Segment>, IFactory<Cat>, IFactory<Robot>,
+        IMagic
+    {
+        byte[] content;
+        Document document;
+        Vector vector = new Vector(0, 0);
+        Segment segment = new Segment(new Vector(1, 2), new Vector(3, 4));
+        Cat cat = new Cat("CatName1", "CatBreed1", DateTime.Now);
+        Robot robot = new Robot("#001");
 
-		// Чтобы класс одновременно реализовывал интерфейсы IFactory<A> и IFactory<B> 
-		// придется воспользоваться так называемой явной реализацией интерфейса.
-		// Чтобы отличать методы создания A и B у каждого метода Create нужно явно указать, к какому интерфейсу он относится.
-		// На самом деле такое вы уже видели, когда реализовывали IEnumerable<T>.
+        Document IFactory<Document>.Create() => document;
 
-		Vector IFactory<Vector>.Create()
-		{
-			throw new NotImplementedException();
-		}
+        Vector IFactory<Vector>.Create() => vector;
 
-		Segment IFactory<Segment>.Create()
-		{
-			throw new NotImplementedException();
-		}
+        Segment IFactory<Segment>.Create() => segment;
 
-		// И так даллее по аналогии...
-	}
+        Cat IFactory<Cat>.Create() => cat;
+
+        Robot IFactory<Robot>.Create() => robot;
+
+        public GhostsTask()
+        { // создаём недосозданный документ ибо он зависит от поля content
+            var encoding = Encoding.ASCII;
+            content = encoding.GetBytes("Hello World");
+            document = new Document("Unnamed1", encoding, content);
+        }
+
+        public void DoMagic()
+        { // портим всё, до чего можем незаметно дотянуться
+            for (var i = 0; i < content.Length; i++)
+                ++content[i];
+            vector.Add(new Vector(5, 6));
+            segment.End.Add(new Vector(7, 8));
+            cat.Rename("CatName2");
+            Robot.BatteryCapacity /= 2;
+        }
+    }
 }
